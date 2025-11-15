@@ -45,8 +45,9 @@ def load_cafe_data(filepath):
     ])
 
     # Convert data types
-    cleaned_df['TransactionDateTime'] = pd.to_datetime(cleaned_df['TransactionDateTime'])
+    cleaned_df['TransactionDateTime'] = pd.to_datetime(cleaned_df['TransactionDateTime'], dayfirst=True)
     cleaned_df['TransactionValue'] = pd.to_numeric(cleaned_df['TransactionValue'].str.replace('$', '', regex=False))
     cleaned_df['Rating'] = pd.to_numeric(cleaned_df['Rating'])
+    cleaned_df['FeedbackID'] = pd.to_numeric(cleaned_df['FeedbackID'])
 
     return cleaned_df
