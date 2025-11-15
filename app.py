@@ -1,7 +1,10 @@
 import pandas as pd
 import streamlit as st
+from utils.data_loader import load_cafe_data
 
-df = pd.read_csv('data/CafeData.csv')
+# data to show
+filepath = 'data/CafeData.csv'
+df = load_cafe_data(filepath)
 
 st.set_page_config(layout="wide")
 st.title("Cafe Sales Data")
