@@ -58,7 +58,7 @@ def display_feedback_section(df):
     }
     regions = ["All"] + list(REGION_LOCATIONS.keys())
 
-    col1, col2, col3, col4 = st.columns([1.2, 0.5, 0.5, 3])
+    col1, col2, col3 = st.columns(3)
     with col1:
         st.header("Customer Ratings")
     with col2:

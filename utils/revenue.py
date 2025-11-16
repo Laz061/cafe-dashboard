@@ -73,7 +73,7 @@ def display_revenue_section(df):
 
     regions = ["All"] + list(REGION_LOCATIONS.keys())
     
-    col1, col2, col3, col4 = st.columns([1.2, 0.5, 0.5, 3])
+    col1, col2, col3 = st.columns(3)
     with col1:
         st.header("Revenue Breakdown")
     
@@ -109,18 +109,20 @@ def display_revenue_section(df):
     cutoff_date = pd.to_datetime('today') - pd.DateOffset(years=2)
     chart_data = filtered_data[filtered_data['TransactionDateTime'] >= cutoff_date].sort_values('TransactionDateTime')
 
-    col1, col2 = st.columns(2, border=True)
+    col1, col2 = st.columns(2)
 
     with col1:
-        # Daily Revenue Chart
-        daily_revenue = chart_data.set_index('TransactionDateTime').resample('D')['TransactionValue'].sum().reset_index()
-        daily_revenue.rename(columns={'TransactionDateTime': 'Date', 'TransactionValue': 'Revenue'}, inplace=True)
-        st.line_chart(
-            daily_revenue,
-            x="Date",
-            y="Revenue",
-            color="#5D4037"
-        )
+        with st.container(border=True):
+            st.subheader("Daily Revenue (Last 2 Years)")
+            # Daily Revenue Chart
+            daily_revenue = chart_data.set_index('TransactionDateTime').resample('D')['TransactionValue'].sum().reset_index()
+            daily_revenue.rename(columns={'TransactionDateTime': 'Date', 'TransactionValue': 'Revenue'}, inplace=True)
+            st.line_chart(
+                daily_revenue,
+                x="Date",
+                y="Revenue",
+                color="#5D4037"
+            )
     
     total_sales = filtered_data['TransactionValue'].sum()
     average_sales = filtered_data['TransactionValue'].mean()
