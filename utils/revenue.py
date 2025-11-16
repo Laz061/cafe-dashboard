@@ -9,6 +9,25 @@ def display_revenue_section(df):
     Args:
         df (pd.DataFrame): The input DataFrame with 'TransactionDateTime' and 'TransactionValue' columns.
     """
+    # Specific Location Information
+    REGION_LOCATIONS = {
+        "Auckland": ["Albany", "Auckland Central", "Botany", "Domain", "Glen Eden", "Glen Innes", "Henderson", "Lincoln Road", "Manukau", "Manukau Centre", "MT Wellington", "New Lynn", "Pakuranga", "Pukekohe", "Queen Street", "Rosebank Road", "Sylvia Park", "Takanini", "Westgate", "Warkworth", "Williams Drive"],
+        "Bay of Plenty": ["Bethlehem", "Gate Pa", "Rotorua", "Whakatane"],
+        "Canterbury": ["Ashburton", "Christchurch (Papanui, Riccarton)", "Ferryhead", "Hornby", "Rangiora", "Timaru"],
+        "Gisborne": ["Gisborne"],
+        "Hawke's Bay": ["Hastings", "Napier"],
+        "Manawatū-Whanganui": ["Levin", "Palmerston Nth", "Wanganui"],
+        "Marlborough": ["Marlborough"],
+        "Nelson": ["Nelson"],
+        "Otago": ["Dunedin", "Oamaru", "Queenstown"],
+        "Southland": ["Invercargill"],
+        "Taranaki": ["New Plymouth"],
+        "Tasman": ["Richmond"],
+        "Waikato": ["Cambridge", "Ruakura", "Te Awamutu", "Te Rapa", "Taupo"],
+        "Wellington": ["Aubyn", "Broadway", "Crofton Downs", "Kapiti", "London St", "Masterton", "Newtown", "Petone", "Porirua", "Upper Hutt", "Wellington central"],
+        "West Coast": ["Greymouth"]
+    }
+
     data = df.copy()
     
     # Revenue breakdown by location
@@ -52,24 +71,6 @@ def display_revenue_section(df):
         ],}
         st_echarts(options=options, height="500px")
 
-    # Specific Location Information
-    REGION_LOCATIONS = {
-        "Auckland": ["Albany", "Auckland Central", "Botany", "Domain", "Glen Eden", "Glen Innes", "Henderson", "Lincoln Road", "Manukau", "Manukau Centre", "MT Wellington", "New Lynn", "Pakuranga", "Pukekohe", "Queen Street", "Rosebank Road", "Sylvia Park", "Takanini", "Westgate", "Warkworth", "Williams Drive"],
-        "Bay of Plenty": ["Bethlehem", "Gate Pa", "Rotorua", "Whakatane"],
-        "Canterbury": ["Ashburton", "Christchurch (Papanui, Riccarton)", "Ferryhead", "Hornby", "Rangiora", "Timaru"],
-        "Gisborne": ["Gisborne"],
-        "Hawke's Bay": ["Hastings", "Napier"],
-        "Manawatū-Whanganui": ["Levin", "Palmerston Nth", "Wanganui"],
-        "Marlborough": ["Marlborough"],
-        "Nelson": ["Nelson"],
-        "Otago": ["Dunedin", "Oamaru", "Queenstown"],
-        "Southland": ["Invercargill"],
-        "Taranaki": ["New Plymouth"],
-        "Tasman": ["Richmond"],
-        "Waikato": ["Cambridge", "Ruakura", "Te Awamutu", "Te Rapa", "Taupo"],
-        "Wellington": ["Aubyn", "Broadway", "Crofton Downs", "Kapiti", "London St", "Masterton", "Newtown", "Petone", "Porirua", "Upper Hutt", "Wellington central"],
-        "West Coast": ["Greymouth"]
-    }
     regions = ["All"] + list(REGION_LOCATIONS.keys())
     
     col1, col2, col3, col4 = st.columns([1.2, 0.5, 0.5, 3])
@@ -108,24 +109,56 @@ def display_revenue_section(df):
     cutoff_date = pd.to_datetime('today') - pd.DateOffset(years=2)
     chart_data = filtered_data[filtered_data['TransactionDateTime'] >= cutoff_date].sort_values('TransactionDateTime')
 
-    
+    col1, col2 = st.columns(2, border=True)
 
-    col1, col2 = st.columns(2, gap='large')
-
-    # Daily Revenue Chart
-    daily_revenue = chart_data.set_index('TransactionDateTime').resample('D')['TransactionValue'].sum()
-    chart_container = col1.container(border=True, height=400)
-    chart_container.line_chart(daily_revenue, color="#5D4037")
+    with col1:
+        # Daily Revenue Chart
+        daily_revenue = chart_data.set_index('TransactionDateTime').resample('D')['TransactionValue'].sum().reset_index()
+        daily_revenue.rename(columns={'TransactionDateTime': 'Date', 'TransactionValue': 'Revenue'}, inplace=True)
+        st.line_chart(
+            daily_revenue,
+            x="Date",
+            y="Revenue",
+            color="#5D4037"
+        )
     
     total_sales = filtered_data['TransactionValue'].sum()
     average_sales = filtered_data['TransactionValue'].mean()
     total_orders = len(filtered_data)
 
     with col2:
-        revenueMetricContainer = st.container(border=True, height=400)
-        revenueMetricContainer.metric("Total Sales", f"${total_sales:,.2f}")
-        revenueMetricContainer.metric("Average Sale", f"${average_sales:,.2f}")
-        revenueMetricContainer.metric("Total Orders", f"{total_orders:,}")
+        # Use markdown with more specific CSS to create larger metric text
+        st.markdown("""
+        <style>
+        div[data-testid="stVerticalBlock"] > [data-testid="stMarkdownContainer"] > p {
+            padding: 0.5rem 0;
+        }
+        .metric-value {
+            font-size: 2.5rem !important;
+            font-weight: 600 !important;
+            line-height: 1.2 !important;
+        }
+        .metric-label {
+            font-size: 1.5rem !important;
+            color: #808495 !important; /* Streamlit's default secondary text color */
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+        st.markdown(f"""
+            <p class="metric-label">Total Revenue</p>
+            <p class="metric-value">${total_sales:,.2f}</p>
+        """, unsafe_allow_html=True)
+
+        st.markdown(f"""
+            <p class="metric-label">Average Transaction</p>
+            <p class="metric-value">${average_sales:,.2f}</p>
+        """, unsafe_allow_html=True)
+
+        st.markdown(f"""
+            <p class="metric-label">Total Transactions</p>
+            <p class="metric-value">{total_orders:,}</p>
+        """, unsafe_allow_html=True)
 
 
 
