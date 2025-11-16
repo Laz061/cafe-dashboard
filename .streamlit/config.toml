@@ -4,3 +4,8 @@ backgroundColor = "#fffbf6ff"
 
 textColor = "#4d342cff" # This controls the axis text color
 primaryColor = "#4d342cff"
+
+[theme.sidebar]
+# Set the sidebar background color
+backgroundColor="#dad5d3ff" 
+primaryColor = "#4d342cff"

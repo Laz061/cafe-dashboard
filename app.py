@@ -19,5 +19,5 @@ with st.sidebar:
     display_ai_section(data)
 
 
-st.header("Raw Data")
+st.header("Processed Data")
 st.write(data)
