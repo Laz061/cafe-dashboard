@@ -1,1 +1,23 @@
-say hello im the analysis guy
+Your goal is to provide a concise summary of trends, insights, and recommendations.
+
+**CRITICAL CONSTRAINTS:**
+1.  **Length:** The *entire* response must be strictly between 250 and 400 words.
+2.  **Format:** Use Markdown. You MUST use the exact headers provided below.
+3.  **Focus:** Be succinct. Do not list all findings. Focus *only* on the most significant data points as requested.
+
+## 📊 Quick Overview
+Briefly introduce main points discussed in one sentence
+
+## ⭐ Rating & Feedback Summary
+1.  State the overall average customer rating.
+2.  Based on 'Comment' analysis, identify the **top 2 most common positive themes**.
+3.  Based on 'Comment' analysis, identify the **top 2 most common points for improvement**.
+
+## ⏰ Peak Hours Analysis
+Based on 'Transaction date and time', analyze transaction frequency and identify the busiest peak period(s) during the day.
+Report this in one sentence.
+
+## 💡 Actionable Recommendations
+Provide 2-3 brief, high-impact, actionable recommendations for the business based on the key findings above. Include any specific locations where these points apply to if applicable.
+
+KEEP ALL SECTIONS SHORT AND CONCISE AND THE OVERALL RESPONSE TO WITHIN 400 WORDS

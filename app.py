@@ -13,10 +13,10 @@ st.set_page_config(layout="wide")
 
 st.title("☕ Cafe Sales Dashboard")
 
-with st.sidebar:
-    display_ai_section(data)
 display_revenue_section(data)
 display_feedback_section(data)
+with st.sidebar:
+    display_ai_section(data)
 
 
 st.header("Raw Data")
