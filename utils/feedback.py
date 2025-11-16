@@ -138,6 +138,26 @@ def display_feedback_section(df):
 
     # Feedback Section
     st.header("Customer Feedback")
+    
+    st.subheader("Most Recent Feedback")
+    recent_feedback = data.sort_values(by='TransactionDateTime', ascending=False).head(3)
+    
+    cols = st.columns(3)
+    for i, (_, row) in enumerate(recent_feedback.iterrows()):
+        with cols[i]:
+            location = row['Location']
+            rating = row['Rating']
+            comment = row['Comment']
+            date = row['TransactionDateTime'].strftime('%d/%m/%Y')
+            
+            st.markdown(
+                f"""
+                **{location}** {draw_stars(rating)}  
+                *{comment}*  
+                <small>{date}</small>
+                """,
+                unsafe_allow_html=True
+            )
 
     # Sort by rating to get top and bottom feedback
     top_feedback = data.sort_values(by='Rating', ascending=False).head(3)
