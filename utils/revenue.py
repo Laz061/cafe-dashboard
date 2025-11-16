@@ -23,7 +23,7 @@ def display_revenue_section(df):
     # Daily Revenue Chart
     daily_revenue = chart_data.set_index('TransactionDateTime').resample('D')['TransactionValue'].sum()
     chart_container = col1.container(border=True, height=400)
-    chart_container.line_chart(daily_revenue, use_container_width=True)
+    chart_container.line_chart(daily_revenue, color="#5D4037")
     
     total_sales = data['TransactionValue'].sum()
     average_sales = data['TransactionValue'].mean()
@@ -40,9 +40,9 @@ def display_revenue_section(df):
     revenue_by_location = data.groupby('Location')['TransactionValue'].sum()
     pie_data = [{"value": round(value), "name": name} for name, value in revenue_by_location.items()]
 
-    col1, col2 = st.columns(2, gap="large")
+    col1, col2 = st.columns(2, gap="large", border= True)
     with col1:
-        topRevenueContainer = st.container(border=True, height=500)
+        topRevenueContainer = st.container()
         top_locations = revenue_by_location.sort_values(ascending=False).head(6)
         topRevenueContainer.subheader("Top Locations by Revenue")
         
@@ -75,7 +75,7 @@ def display_revenue_section(df):
             }
         ],}
         st_echarts(options=options, height="500px")
-    
+
 
 
 

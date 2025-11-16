@@ -1,0 +1,6 @@
+[theme]
+# This sets the main page background
+backgroundColor = "#fffbf6ff"
+
+textColor = "#4d342cff" # This controls the axis text color
+primaryColor = "#4d342cff"

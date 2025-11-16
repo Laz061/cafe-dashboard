@@ -1,3 +1,11 @@
-# Byte-compiled / optimized / DLL files
+# Virtual Environment
+.venv/
+
+# Python cache
 __pycache__/
-*.py[
+
+# IDE settings
+.vscode/
+
+# Secrets - Do not commit this file
+.streamlit/secrets.toml

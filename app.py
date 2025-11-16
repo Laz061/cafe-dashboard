@@ -8,6 +8,7 @@ filepath = 'data/CafeData.csv'
 data = load_cafe_data(filepath)
 
 st.set_page_config(layout="wide")
+
 st.title("☕ Cafe Sales Dashboard")
 
 display_revenue_section(data)
