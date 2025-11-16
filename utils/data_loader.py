@@ -9,7 +9,7 @@ def load_cafe_data(filepath):
     
     cleaned_rows = []
 
-    # Step 2: Process each row, skipping the header
+    # Process each row, skipping the header
     for _, row in df_raw.iloc[1:].iterrows():
         # Drop empty cells (from trailing commas)
         values = row.dropna().tolist()
@@ -31,10 +31,9 @@ def load_cafe_data(filepath):
 
             cleaned_rows.append(cleaned)
         else:
-            # Row too short (currently no data in this form)
-            print("Skipping malformed row:", values)
+            print("Skipping unhandled row:", values)
 
-    # Step 3: Build final dataframe
+    # Build final dataframe
     cleaned_df = pd.DataFrame(cleaned_rows, columns=[
         "Location",
         "Rating",

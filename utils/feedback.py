@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# --- Function to Draw Star Icons ---
+# Function to Draw Star Icons
 def draw_stars(rating, max_stars=5):
     """Generates HTML string for filled and empty star icons."""
     filled_stars = '★' * int(rating)
@@ -91,29 +91,23 @@ def display_feedback_section(df):
     if location != "All":
         data = data[data['Location'] == location]
 
-    #Data processing
+    # Calculate Review Data
     total_reviews = len(data["Rating"])
     average_rating = data['Rating'].mean() if not data.empty else 0
     rating_counts = data['Rating'].value_counts().sort_index(ascending=False)
 
-    # Create two columns for the rating breakdown
+
     col_left, col_right = st.columns([1, 2.5])
 
-    # --- Left Column: Overall Average Rating ---
+    # Left Column: Overall Average Rating
     with col_left:
-        # Format the average rating to one decimal place
+        # Format and display Average rating, stars and total number of reviews
         avg_rating_str = f"{average_rating:.1f}"
-        
-        # Display the large average rating
         st.markdown(f'<p class="big-font">{avg_rating_str}</p>', unsafe_allow_html=True)
-        
-        # Display the star representation
         st.markdown(draw_stars(average_rating), unsafe_allow_html=True)
-        
-        # Display the total number of reviews
         st.markdown(f"**{total_reviews} reviews**")
 
-    # --- Right Column: Star Breakdown Bars ---
+    # Star Breakdown Bars
     with col_right:
         # Iterate from 5 stars down to 1 star
         for rating in range(5, 0, -1):
@@ -126,7 +120,7 @@ def display_feedback_section(df):
             # Create a row of three inner columns for layout: [Star Label] [Progress Bar] [Count]
             row_col1, row_col2, row_col3 = st.columns([0.5, 3, 0.5])
             
-            # Column 1: Star label (e.g., '5 ★')
+            # Star label (e.g., '5 *')
             with row_col1:
                 # Use markdown for consistent styling and a custom class for alignment/color
                 st.markdown(
@@ -134,16 +128,15 @@ def display_feedback_section(df):
                     unsafe_allow_html=True
                 )
 
-            # Column 2: Progress Bar
+            # Progress Bar
             with row_col2:
-                # Use st.progress to draw the bar based on the percentage
                 st.progress(percentage)
 
-            # Column 3: Count
+            # Count
             with row_col3:
                 st.markdown(f'<div style="text-align: right;">{count}</div>', unsafe_allow_html=True)
 
-    # --- Feedback Section ---
+    # Feedback Section
     st.header("Customer Feedback")
 
     # Sort by rating to get top and bottom feedback
