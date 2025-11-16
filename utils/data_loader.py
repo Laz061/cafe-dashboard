@@ -26,7 +26,6 @@ def load_cafe_data(filepath):
                 values[4]   # FeedbackID
             ]
         elif len(values) == 7:
-            print(f"processing 7row: {values[0]}")
             if pd.to_datetime(values[3], errors='coerce') is pd.NaT:
                 values[3] = None # Replace invalid date with None
 

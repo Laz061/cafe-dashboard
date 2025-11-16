@@ -28,49 +28,41 @@ def display_revenue_section(df):
         "West Coast": ["Greymouth"]
     }
 
+    # Use markdown with more specific CSS to create larger metric text
+    st.markdown("""
+        <style>
+        div[data-testid="stVerticalBlock"] > [data-testid="stMarkdownContainer"] > p {
+            padding: 0.5rem 0;
+        }
+        .metric-value {
+            font-size: 2.5rem !important;
+            font-weight: 600 !important;
+            line-height: 1.2 !important;
+        }
+        .metric-label {
+            font-size: 1.5rem !important;
+            color: #808495 !important; /* Streamlit's default secondary text color */
+        }
+        /* Smaller styles for the top locations section */
+        .top-metric-value {
+            font-size: 2.5rem !important;
+            font-weight: 600 !important;
+            line-height: 1.2 !important;
+        }
+        .top-metric-label {
+            font-size: 1.5rem !important;
+            color: #808495 !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+        )
+
     data = df.copy()
+    # Create a reverse mapping from location to region
+    location_to_region = {location: region for region, locations in REGION_LOCATIONS.items() for location in locations}
+    data['Region'] = data['Location'].map(location_to_region)
     
-    # Revenue breakdown by location
-    st.header("Total Revenue")
-    revenue_by_location = data.groupby('Location')['TransactionValue'].sum()
-    pie_data = [{"value": round(value), "name": name} for name, value in revenue_by_location.items()]
-
-    col1, col2 = st.columns(2, gap="large", border= True)
-    with col1:
-        topRevenueContainer = st.container()
-        top_locations = revenue_by_location.sort_values(ascending=False).head(6)
-        topRevenueContainer.subheader("Top Locations by Revenue")
-        
-        cols = topRevenueContainer.columns(2)
-        i = 0
-        for location, revenue in top_locations.items():
-            col_index = i % 2
-            cols[col_index].metric(label=f"#{i+1} {location}", value=f"${revenue:,.2f}")
-            i += 1
-    with col2:
-        # Pie chart setup
-        options = {
-        "tooltip": {"trigger": "item"},
-        "series": [
-            {
-                "name": "Revenue By Location",
-                "type": "pie",
-                "radius": ["40%", "70%"],
-                "avoidLabelOverlap": False,
-                "itemStyle": {
-                    "borderRadius": 10,
-                    "borderColor": "#fff",
-                    "borderWidth": 2,
-                },
-                "label": {"show": False, "position": "center"},
-                "emphasis": {
-                },
-                "labelLine": {"show": False},
-                "data": pie_data,
-            }
-        ],}
-        st_echarts(options=options, height="500px")
-
     regions = ["All"] + list(REGION_LOCATIONS.keys())
     
     col1, col2, col3 = st.columns(3)
@@ -150,24 +142,6 @@ def display_revenue_section(df):
     total_orders = len(chart_data)
 
     with col2:
-        # Use markdown with more specific CSS to create larger metric text
-        st.markdown("""
-        <style>
-        div[data-testid="stVerticalBlock"] > [data-testid="stMarkdownContainer"] > p {
-            padding: 0.5rem 0;
-        }
-        .metric-value {
-            font-size: 2.5rem !important;
-            font-weight: 600 !important;
-            line-height: 1.2 !important;
-        }
-        .metric-label {
-            font-size: 1.5rem !important;
-            color: #808495 !important; /* Streamlit's default secondary text color */
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
         st.markdown(f"""
             <p class="metric-label">Total Revenue</p>
             <p class="metric-value">${total_sales:,.2f}</p>
@@ -182,6 +156,62 @@ def display_revenue_section(df):
             <p class="metric-label">Total Transactions</p>
             <p class="metric-value">{total_orders:,}</p>
         """, unsafe_allow_html=True)
+
+    # Revenue breakdown by location
+    col1, col2 = st.columns(2, gap="large", border= True)
+    with col1:
+        topRevenueContainer = st.container()
+        revenue_by_location = data.groupby('Location')['TransactionValue'].sum()
+        top_locations = revenue_by_location.sort_values(ascending=False).head(6)
+        topRevenueContainer.subheader("Top Locations by Revenue")
+        
+        cols = topRevenueContainer.columns(2)
+        i = 0
+        for location, revenue in top_locations.items():
+            col_index = i % 2
+            cols[col_index].markdown(f"""
+                <p class="top-metric-label">#{i+1} {location}</p>
+                <p class="top-metric-value">${revenue:,.2f}</p>
+            """, unsafe_allow_html=True)
+            i += 1
+    with col2:
+        group_by = st.radio(
+            "Group Revenue By:",
+            ('Region', 'Location'),
+            horizontal=True,
+        )
+
+        if group_by == 'Location':
+            revenue_grouped = data.groupby('Location')['TransactionValue'].sum()
+        else: # group_by == 'Region'
+            revenue_grouped = data.groupby('Region')['TransactionValue'].sum()
+
+        pie_data = [{"value": round(value), "name": name} for name, value in revenue_grouped.items()]
+
+        # Pie chart setup
+        options = {
+        "tooltip": {"trigger": "item"},
+        "series": [
+            {
+                "name": "Revenue",
+                "type": "pie",
+                "radius": ["40%", "80%"],
+                "avoidLabelOverlap": False,
+                "itemStyle": {
+                    "borderRadius": 10,
+                    "borderColor": "#fff",
+                    "borderWidth": 2,
+                },
+                "label": {"show": False},
+                "emphasis": {
+                },
+                "labelLine": {"show": False},
+                "data": pie_data,
+            }
+        ],}
+        st_echarts(options=options, height="450px")
+
+
 
 
 
