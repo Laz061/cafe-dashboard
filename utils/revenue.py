@@ -13,7 +13,7 @@ def display_revenue_section(df):
     REGION_LOCATIONS = {
         "Auckland": ["Albany", "Auckland Central", "Botany", "Domain", "Glen Eden", "Glen Innes", "Henderson", "Lincoln Road", "Manukau", "Manukau Centre", "MT Wellington", "New Lynn", "Pakuranga", "Pukekohe", "Queen Street", "Rosebank Road", "Sylvia Park", "Takanini", "Westgate", "Warkworth", "Williams Drive"],
         "Bay of Plenty": ["Bethlehem", "Gate Pa", "Rotorua", "Whakatane"],
-        "Canterbury": ["Ashburton", "Christchurch (Papanui, Riccarton)", "Ferryhead", "Hornby", "Rangiora", "Timaru"],
+        "Canterbury": ["Ashburton", "Ferryhead", "Hornby", "Rangiora", "Timaru"],
         "Gisborne": ["Gisborne"],
         "Hawke's Bay": ["Hastings", "Napier"],
         "Manawatū-Whanganui": ["Levin", "Palmerston Nth", "Wanganui"],
@@ -105,28 +105,49 @@ def display_revenue_section(df):
     if location != "All":
         filtered_data = filtered_data[filtered_data['Location'] == location]
     
-    # Calculate the cutoff date for the last two years
+    # Calculate the cutoff date for the last two years to accomodate the dataset
     cutoff_date = pd.to_datetime('today') - pd.DateOffset(years=2)
     chart_data = filtered_data[filtered_data['TransactionDateTime'] >= cutoff_date].sort_values('TransactionDateTime')
 
     col1, col2 = st.columns(2)
 
     with col1:
-        with st.container(border=True):
-            st.subheader("Daily Revenue (Last 2 Years)")
+            st.subheader("Daily Revenue")
             # Daily Revenue Chart
             daily_revenue = chart_data.set_index('TransactionDateTime').resample('D')['TransactionValue'].sum().reset_index()
             daily_revenue.rename(columns={'TransactionDateTime': 'Date', 'TransactionValue': 'Revenue'}, inplace=True)
-            st.line_chart(
-                daily_revenue,
-                x="Date",
-                y="Revenue",
-                color="#5D4037"
-            )
+            
+            # ECharts options for a non-interactive line chart
+            line_chart_options = {
+                "xAxis": {
+                    "type": "category",
+                    "data": daily_revenue['Date'].dt.strftime('%Y-%m-%d').tolist(),
+                    "name": "Date",
+                    "nameLocation": "middle",
+                    "nameGap": 30
+                },
+                "yAxis": {
+                    "type": "value",
+                    "name": "Revenue ($)",
+                    "nameLocation": "middle",
+                    "nameGap": 45
+                },
+                "tooltip": {
+                    "trigger": "axis",
+                    "formatter": "Date: {b}<br/>Revenue: ${c}",
+                },
+                "series": [{
+                    "data": daily_revenue['Revenue'].tolist(),
+                    "type": "line",
+                    "smooth": True,
+                    "color": "#5D4037",
+                }],
+            }
+            st_echarts(options=line_chart_options)
     
-    total_sales = filtered_data['TransactionValue'].sum()
-    average_sales = filtered_data['TransactionValue'].mean()
-    total_orders = len(filtered_data)
+    total_sales = chart_data['TransactionValue'].sum()
+    average_sales = chart_data['TransactionValue'].mean()
+    total_orders = len(chart_data)
 
     with col2:
         # Use markdown with more specific CSS to create larger metric text
