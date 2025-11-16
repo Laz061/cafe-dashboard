@@ -10,32 +10,9 @@ def display_revenue_section(df):
         df (pd.DataFrame): The input DataFrame with 'TransactionDateTime' and 'TransactionValue' columns.
     """
     data = df.copy()
-
-    # Calculate the cutoff date for the last two years
-    cutoff_date = pd.to_datetime('today') - pd.DateOffset(years=2)
-    chart_data = data[data['TransactionDateTime'] >= cutoff_date].sort_values('TransactionDateTime')
-
-    st.header("Revenue Breakdown")
-
-    col1, col2 = st.columns(2, gap='large')
-
-    # Daily Revenue Chart
-    daily_revenue = chart_data.set_index('TransactionDateTime').resample('D')['TransactionValue'].sum()
-    chart_container = col1.container(border=True, height=400)
-    chart_container.line_chart(daily_revenue, color="#5D4037")
-    
-    total_sales = data['TransactionValue'].sum()
-    average_sales = data['TransactionValue'].mean()
-    total_orders = len(data)
-
-    with col2:
-        revenueMetricContainer = st.container(border=True, height=400)
-        revenueMetricContainer.metric("Total Sales", f"${total_sales:,.2f}")
-        revenueMetricContainer.metric("Average Sale", f"${average_sales:,.2f}")
-        revenueMetricContainer.metric("Total Orders", f"{total_orders:,}")
     
     # Revenue breakdown by location
-    st.header("Revenue by Location")
+    st.header("Total Revenue")
     revenue_by_location = data.groupby('Location')['TransactionValue'].sum()
     pie_data = [{"value": round(value), "name": name} for name, value in revenue_by_location.items()]
 
@@ -74,6 +51,83 @@ def display_revenue_section(df):
             }
         ],}
         st_echarts(options=options, height="500px")
+
+    # Specific Location Information
+    REGION_LOCATIONS = {
+        "Auckland": ["Albany", "Auckland Central", "Botany", "Domain", "Glen Eden", "Glen Innes", "Henderson", "Lincoln Road", "Manukau", "Manukau Centre", "MT Wellington", "New Lynn", "Pakuranga", "Pukekohe", "Queen Street", "Rosebank Road", "Sylvia Park", "Takanini", "Westgate", "Warkworth", "Williams Drive"],
+        "Bay of Plenty": ["Bethlehem", "Gate Pa", "Rotorua", "Whakatane"],
+        "Canterbury": ["Ashburton", "Christchurch (Papanui, Riccarton)", "Ferryhead", "Hornby", "Rangiora", "Timaru"],
+        "Gisborne": ["Gisborne"],
+        "Hawke's Bay": ["Hastings", "Napier"],
+        "Manawatū-Whanganui": ["Levin", "Palmerston Nth", "Wanganui"],
+        "Marlborough": ["Marlborough"],
+        "Nelson": ["Nelson"],
+        "Otago": ["Dunedin", "Oamaru", "Queenstown"],
+        "Southland": ["Invercargill"],
+        "Taranaki": ["New Plymouth"],
+        "Tasman": ["Richmond"],
+        "Waikato": ["Cambridge", "Ruakura", "Te Awamutu", "Te Rapa", "Taupo"],
+        "Wellington": ["Aubyn", "Broadway", "Crofton Downs", "Kapiti", "London St", "Masterton", "Newtown", "Petone", "Porirua", "Upper Hutt", "Wellington central"],
+        "West Coast": ["Greymouth"]
+    }
+    regions = ["All"] + list(REGION_LOCATIONS.keys())
+    
+    col1, col2, col3, col4 = st.columns([1.2, 0.5, 0.5, 3])
+    with col1:
+        st.header("Revenue Breakdown")
+    
+    with col2:
+        region = st.selectbox(
+            "Region",
+            regions,
+            index=0,
+        )
+
+    locations_in_region = ["All"]
+    if region != "All":
+        locations_in_region.extend(REGION_LOCATIONS[region])
+    else:
+        # If 'All' regions, show all unique locations from the dataframe
+        locations_in_region.extend(sorted(data['Location'].unique().tolist()))
+
+    with col3:
+        location = st.selectbox(
+            "Location",
+            locations_in_region,
+            index=0,
+        )
+
+    filtered_data = data.copy()
+    if region != "All":
+        filtered_data = filtered_data[filtered_data['Location'].isin(REGION_LOCATIONS[region])]
+    
+    if location != "All":
+        filtered_data = filtered_data[filtered_data['Location'] == location]
+    
+    # Calculate the cutoff date for the last two years
+    cutoff_date = pd.to_datetime('today') - pd.DateOffset(years=2)
+    chart_data = filtered_data[filtered_data['TransactionDateTime'] >= cutoff_date].sort_values('TransactionDateTime')
+
+    
+
+    col1, col2 = st.columns(2, gap='large')
+
+    # Daily Revenue Chart
+    daily_revenue = chart_data.set_index('TransactionDateTime').resample('D')['TransactionValue'].sum()
+    chart_container = col1.container(border=True, height=400)
+    chart_container.line_chart(daily_revenue, color="#5D4037")
+    
+    total_sales = filtered_data['TransactionValue'].sum()
+    average_sales = filtered_data['TransactionValue'].mean()
+    total_orders = len(filtered_data)
+
+    with col2:
+        revenueMetricContainer = st.container(border=True, height=400)
+        revenueMetricContainer.metric("Total Sales", f"${total_sales:,.2f}")
+        revenueMetricContainer.metric("Average Sale", f"${average_sales:,.2f}")
+        revenueMetricContainer.metric("Total Orders", f"{total_orders:,}")
+
+
 
 
 

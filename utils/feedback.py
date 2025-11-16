@@ -9,13 +9,6 @@ def draw_stars(rating, max_stars=5):
     return f'<span style="color:#c9935c;">{filled_stars}</span>{empty_stars}'
 
 def display_feedback_section(df):
-    
-    #Data processing
-    data = df.copy()
-    total_reviews = len(data["Rating"])
-    average_rating = data['Rating'].mean()
-    rating_counts = data['Rating'].value_counts().sort_index(ascending=False)
-
     st.markdown(
         """
         <style>
@@ -43,7 +36,65 @@ def display_feedback_section(df):
         unsafe_allow_html=True
     )
 
-    st.header("Customer Ratings")
+    data = df.copy()
+
+    # Define regions and their locations
+    REGION_LOCATIONS = {
+        "Auckland": ["Albany", "Auckland Central", "Botany", "Domain", "Glen Eden", "Glen Innes", "Henderson", "Lincoln Road", "Manukau", "Manukau Centre", "MT Wellington", "New Lynn", "Pakuranga", "Pukekohe", "Queen Street", "Rosebank Road", "Sylvia Park", "Takanini", "Westgate", "Warkworth", "Williams Drive"],
+        "Bay of Plenty": ["Bethlehem", "Gate Pa", "Rotorua", "Whakatane"],
+        "Canterbury": ["Ashburton", "Christchurch (Papanui, Riccarton)", "Ferryhead", "Hornby", "Rangiora", "Timaru"],
+        "Gisborne": ["Gisborne"],
+        "Hawke's Bay": ["Hastings", "Napier"],
+        "Manawatū-Whanganui": ["Levin", "Palmerston Nth", "Wanganui"],
+        "Marlborough": ["Marlborough"],
+        "Nelson": ["Nelson"],
+        "Otago": ["Dunedin", "Oamaru", "Queenstown"],
+        "Southland": ["Invercargill"],
+        "Taranaki": ["New Plymouth"],
+        "Tasman": ["Richmond"],
+        "Waikato": ["Cambridge", "Ruakura", "Te Awamutu", "Te Rapa", "Taupo"],
+        "Wellington": ["Aubyn", "Broadway", "Crofton Downs", "Kapiti", "London St", "Masterton", "Newtown", "Petone", "Porirua", "Upper Hutt", "Wellington central"],
+        "West Coast": ["Greymouth"]
+    }
+    regions = ["All"] + list(REGION_LOCATIONS.keys())
+
+    col1, col2, col3, col4 = st.columns([1.2, 0.5, 0.5, 3])
+    with col1:
+        st.header("Customer Ratings")
+    with col2:
+        region = st.selectbox(
+            "Region",
+            regions,
+            index=0,
+            key="feedback_region"
+        )
+
+    locations_in_region = ["All"]
+    if region != "All":
+        locations_in_region.extend(REGION_LOCATIONS[region])
+    else:
+        # If 'All' regions, show all unique locations from the dataframe
+        locations_in_region.extend(sorted(df['Location'].unique().tolist()))
+
+    with col3:
+        location = st.selectbox(
+            "Location",
+            locations_in_region,
+            index=0,
+            key="feedback_location"
+        )
+        
+    # Filter data based on selection
+    if region != "All":
+        data = data[data['Location'].isin(REGION_LOCATIONS[region])]
+    
+    if location != "All":
+        data = data[data['Location'] == location]
+
+    #Data processing
+    total_reviews = len(data["Rating"])
+    average_rating = data['Rating'].mean() if not data.empty else 0
+    rating_counts = data['Rating'].value_counts().sort_index(ascending=False)
 
     # Create two columns for the rating breakdown
     col_left, col_right = st.columns([1, 2.5])
