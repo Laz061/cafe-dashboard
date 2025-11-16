@@ -49,5 +49,6 @@ def load_cafe_data(filepath):
     cleaned_df['TransactionValue'] = pd.to_numeric(cleaned_df['TransactionValue'].str.replace('$', '', regex=False))
     cleaned_df['Rating'] = pd.to_numeric(cleaned_df['Rating'])
     cleaned_df['FeedbackID'] = pd.to_numeric(cleaned_df['FeedbackID'])
+    cleaned_df['Location'] = cleaned_df['Location'].str.strip()
 
     return cleaned_df

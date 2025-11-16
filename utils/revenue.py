@@ -10,7 +10,6 @@ def display_revenue_section(df):
         df (pd.DataFrame): The input DataFrame with 'TransactionDateTime' and 'TransactionValue' columns.
     """
     data = df.copy()
-    data['Location'] = data['Location'].str.strip()
 
     # Calculate the cutoff date for the last two years
     cutoff_date = pd.to_datetime('today') - pd.DateOffset(years=2)
