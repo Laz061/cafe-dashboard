@@ -18,6 +18,4 @@ display_feedback_section(data)
 with st.sidebar:
     display_ai_section(data)
 
-
-st.header("Processed Data")
 st.write(data)

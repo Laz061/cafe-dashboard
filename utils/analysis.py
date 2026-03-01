@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
-from openai import OpenAI
-from streamlit_echarts import st_echarts
 from pathlib import Path
+from openai import OpenAI
 
 @st.cache_data(show_spinner="AI is analyzing the data...", ttl=86400)
 def get_ai_analysis(data_csv):
@@ -37,16 +36,14 @@ def get_ai_analysis(data_csv):
 
 def display_ai_section(df):
 
-    st.header("AI Analysis")
+    st.header("Summary")
  
-    if st.button("Run Analysis"):
+    if st.button("get summary"):
         st.cache_data.clear()
-        st.success("Analysis cache has been cleared. The analysis will be regenerated on the next run.")
         st.rerun()
 
     data_csv = df.to_csv(index=False)
-    # This will run on the first load and cache the result.
-    # On subsequent loads, it will retrieve from the cache.
+    
     analysis_result = get_ai_analysis(data_csv)
     
     if analysis_result:

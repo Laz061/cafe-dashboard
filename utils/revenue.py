@@ -110,32 +110,45 @@ def display_revenue_section(df):
             daily_revenue.rename(columns={'TransactionDateTime': 'Date', 'TransactionValue': 'Revenue'}, inplace=True)
             
             # ECharts options for a non-interactive line chart
+            # Use native Python types so options serialize to JSON correctly
+            x_data = [str(d) for d in daily_revenue['Date'].dt.strftime('%Y-%m-%d')]
+            y_data = [float(x) for x in daily_revenue['Revenue']]
             line_chart_options = {
+                "backgroundColor": "#fffbf6",
+                "textStyle": {"color": "#4d342c"},
                 "xAxis": {
                     "type": "category",
-                    "data": daily_revenue['Date'].dt.strftime('%Y-%m-%d').tolist(),
+                    "data": x_data,
                     "name": "Date",
                     "nameLocation": "middle",
-                    "nameGap": 30
+                    "nameGap": 30,
+                    "axisLabel": {"color": "#4d342c"},
+                    "axisLine": {"lineStyle": {"color": "#4d342c"}},
                 },
                 "yAxis": {
                     "type": "value",
                     "name": "Revenue ($)",
                     "nameLocation": "middle",
-                    "nameGap": 45
+                    "nameGap": 45,
+                    "axisLabel": {"color": "#4d342c"},
+                    "axisLine": {"lineStyle": {"color": "#4d342c"}},
+                    "splitLine": {"lineStyle": {"color": "#e0d9d6"}},
                 },
                 "tooltip": {
                     "trigger": "axis",
                     "formatter": "Date: {b}<br/>Revenue: ${c}",
+                    "backgroundColor": "#fffbf6",
+                    "borderColor": "#4d342c",
+                    "textStyle": {"color": "#4d342c"},
                 },
                 "series": [{
-                    "data": daily_revenue['Revenue'].tolist(),
+                    "data": y_data,
                     "type": "line",
                     "smooth": True,
                     "color": "#5D4037",
                 }],
             }
-            st_echarts(options=line_chart_options)
+            st_echarts(options=line_chart_options, height="400px")
     
     total_sales = chart_data['TransactionValue'].sum()
     average_sales = chart_data['TransactionValue'].mean()
@@ -186,11 +199,13 @@ def display_revenue_section(df):
         else: # group_by == 'Region'
             revenue_grouped = data.groupby('Region')['TransactionValue'].sum()
 
-        pie_data = [{"value": round(value), "name": name} for name, value in revenue_grouped.items()]
+        pie_data = [{"value": int(round(float(value))), "name": str(name)} for name, value in revenue_grouped.items()]
 
-        # Pie chart setup
+        # Pie chart setup — explicit light background so chart isn't blacked out
         options = {
-        "tooltip": {"trigger": "item"},
+        "backgroundColor": "#fffbf6",
+        "textStyle": {"color": "#4d342c"},
+        "tooltip": {"trigger": "item", "backgroundColor": "#fffbf6", "borderColor": "#4d342c", "textStyle": {"color": "#4d342c"}},
         "series": [
             {
                 "name": "Revenue",

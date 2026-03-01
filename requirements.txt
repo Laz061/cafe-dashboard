@@ -1,4 +1,4 @@
-pandas
-streamlit
-streamlit-echarts
-openai
+pandas>=2.0.0
+streamlit>=1.51.0
+streamlit-echarts>=0.5.0
+openai>=1.0.0
