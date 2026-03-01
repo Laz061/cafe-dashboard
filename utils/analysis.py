@@ -38,12 +38,12 @@ def display_ai_section(df):
 
     st.header("Summary")
  
-    if st.button("get summary"):
+    if st.button("Generate Summary"):
         st.cache_data.clear()
         st.rerun()
 
     data_csv = df.to_csv(index=False)
-    
+
     analysis_result = get_ai_analysis(data_csv)
     
     if analysis_result:
