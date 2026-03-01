@@ -1,6 +1,6 @@
 # CozyCafe Customer Radar
 
-A Streamlit dashboard built to visualize, analyze customer feedback and sales data for a cafe chain.
+A Streamlit dashboard built to visualize, analyze customer feedback and sales data for a local cafe.
 
 ## Live Demo
 
